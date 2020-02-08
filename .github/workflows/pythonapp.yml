@@ -18,11 +18,12 @@ jobs:
         python-version: 3.8
     - name: Install dependencies
       run: |
+        working-directory: ./original_data
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     - name: getdata and process data
-      working-directory: ./original_data
       run: |
+        working-directory: ./original_data
         python getdata.py
         python process_data.py
     
@@ -36,7 +37,7 @@ jobs:
     - name: Push changes
       uses: ad-m/github-push-action@v0.5.0
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ secrets.GITHUB_TOKEN_1 }}
         force: true
       
         
