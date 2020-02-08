@@ -30,7 +30,6 @@ jobs:
         python process_data.py
     
     - name: Commit files
-      working-directory: ./
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"

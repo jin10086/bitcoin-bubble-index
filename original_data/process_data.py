@@ -246,7 +246,7 @@ def process_data():
     assert len(json_data["bubble"]) == len(json_data["price"])
 
     # Write json data to file
-    file = open("../data.json", "w")
+    file = open("data.json", "w")
     file.write("data = '")
     file.write(json.dumps(json_data))
     file.write("'")
