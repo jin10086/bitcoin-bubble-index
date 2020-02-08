@@ -3,6 +3,7 @@ import datetime
 import json
 import math
 import re
+import os
 
 findDate = re.compile("\d{4}\/\d{2}\/\d{2}")
 
@@ -85,7 +86,7 @@ def get_day(start_date, gap_day):
     return target_date
 
 
-def read_datafile(filename):
+def read_datafile(filename, lastData=""):
     """Read txt data file by given the filename.
 
     Parameters
@@ -100,7 +101,6 @@ def read_datafile(filename):
         '2010/07/26:181.543' or '2010/12/07:5.25E-5'
     """
     result = []
-
     file = open(filename, "r")
     txt_data = file.read()
     index = 0
@@ -112,8 +112,12 @@ def read_datafile(filename):
             # key = data.translate(None, '[new Date("")')
         else:
             value = data.replace("]", "")
-            if value != "null":
-                result.append(key + ":" + value)
+            if key > "2010/07/16":
+                if lastData:
+                    if key <= lastData:
+                        result.append(key + ":" + value)
+                else:
+                    result.append(key + ":" + value)
         index += 1
 
     return result
@@ -151,16 +155,17 @@ def add_missing_data(start_date, end_date, init_value, scale_factor):
 def process_data():
     """Convert original data to json file
     """
-    # Bitcoin price in USD
-    price = read_datafile("price.txt")
-    # Difficulty index for bitcoin minining
-    difficulty = read_datafile("difficulty.txt")
     # Google trend index
     gtread = read_datafile("gtrend.txt")
+    lastData = gtread[-1].split(":")[0]  # 允许的最大日期（有时候gtread的值差了7天）
+    # Bitcoin price in USD
+    price = read_datafile("price.txt", lastData)
+    # Difficulty index for bitcoin minining
+    difficulty = read_datafile("difficulty.txt", lastData)
     # Number of active address
-    sentaddr = read_datafile("sentaddr.txt")
+    sentaddr = read_datafile("sentaddr.txt", lastData)
     # Number of transacation per day
-    trasaction = read_datafile("transaction.txt")
+    trasaction = read_datafile("transaction.txt", lastData)
     # Number of tweets per day
     # Tweets file lacks of the data before the date '2014/04/09',
     # so we mamuannly add missing data from 2010/07/17.
@@ -170,7 +175,7 @@ def process_data():
         init_value=300,
         scale_factor=0.002,
     )
-    tweets += read_datafile("tweets.txt")
+    tweets += read_datafile("tweets.txt", lastData)
 
     json_data = {}
     json_data["date"] = []
@@ -200,7 +205,6 @@ def process_data():
     # Get keywords Hot value
     for i in range(len(gtread)):
         gtrend_key, gtread_value = gtread[i].split(":")
-        print(gtrend_key, gtread_value)
         assert gtrend_key == json_data["date"][i]
         tweets_key, tweets_value = tweets[i].split(":")
         assert tweets_key == json_data["date"][i]
