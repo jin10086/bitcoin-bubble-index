@@ -4,6 +4,7 @@ import json
 import math
 import re
 import os
+import random
 
 findDate = re.compile("\d{4}\/\d{2}\/\d{2}")
 
@@ -250,6 +251,7 @@ def process_data():
     file.write("data = '")
     file.write(json.dumps(json_data))
     file.write("'")
+    file.write(random.choices(range(10))[0] * " ")
     file.close()
 
 
