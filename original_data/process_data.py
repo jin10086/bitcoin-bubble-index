@@ -2,6 +2,9 @@ import collections
 import datetime
 import json
 import math
+import re
+
+findDate = re.compile("\d{4}\/\d{2}\/\d{2}")
 
 
 def get_bubble_index(
@@ -10,7 +13,7 @@ def get_bubble_index(
     hot_keywords,
     difficulty_value,
     sentaddr_value,
-    trascation_value,
+    trasaction_value,
 ):
     """Calculate bitcoin bubble index
 
@@ -35,7 +38,7 @@ def get_bubble_index(
         bubble index
     """
     bubble_index_0 = (
-        5000 * price / (sentaddr_value + difficulty_value / 10000000 + trascation_value)
+        5000 * price / (sentaddr_value + difficulty_value / 10000000 + trasaction_value)
     )
     bubble_index_1 = growth_60_day * math.pi + hot_keywords / math.pi
     return bubble_index_0 + bubble_index_1 / 10.0 - 30.0
@@ -105,10 +108,12 @@ def read_datafile(filename):
     value = ""
     for data in txt_data.split(","):
         if index % 2 == 0:
-            key = data.translate(None, '[new Date("")')
+            key = findDate.findall(data)[0]
+            # key = data.translate(None, '[new Date("")')
         else:
-            value = data.translate(None, "]")
-            result.append(key + ":" + value)
+            value = data.replace("]", "")
+            if value != "null":
+                result.append(key + ":" + value)
         index += 1
 
     return result
@@ -155,7 +160,7 @@ def process_data():
     # Number of active address
     sentaddr = read_datafile("sentaddr.txt")
     # Number of transacation per day
-    trascation = read_datafile("transcation.txt")
+    trasaction = read_datafile("transaction.txt")
     # Number of tweets per day
     # Tweets file lacks of the data before the date '2014/04/09',
     # so we mamuannly add missing data from 2010/07/17.
@@ -195,6 +200,7 @@ def process_data():
     # Get keywords Hot value
     for i in range(len(gtread)):
         gtrend_key, gtread_value = gtread[i].split(":")
+        print(gtrend_key, gtread_value)
         assert gtrend_key == json_data["date"][i]
         tweets_key, tweets_value = tweets[i].split(":")
         assert tweets_key == json_data["date"][i]
@@ -211,15 +217,15 @@ def process_data():
         assert difficulty_key == json_data["date"][i]
         sentaddr_key, sentaddr_value = sentaddr[i].split(":")
         assert sentaddr_key == json_data["date"][i]
-        trascation_key, trascation_value = trascation[i].split(":")
-        assert trascation_key == json_data["date"][i]
+        trasaction_key, trasaction_value = trasaction[i].split(":")
+        assert trasaction_key == json_data["date"][i]
 
         difficulty_value = (
             0.0 if difficulty_value == "null" else float(difficulty_value)
         )
         sentaddr_value = 0.0 if sentaddr_value == "null" else float(sentaddr_value)
-        trascation_value = (
-            0.0 if trascation_value == "null" else float(trascation_value)
+        trasaction_value = (
+            0.0 if trasaction_value == "null" else float(trasaction_value)
         )
 
         bubble_index = get_bubble_index(
@@ -228,7 +234,7 @@ def process_data():
             float(json_data["hot"][i]),
             float(difficulty_value),
             float(sentaddr_value),
-            float(trascation_value),
+            float(trasaction_value),
         )
 
         json_data["bubble"].append(int(bubble_index))
