@@ -4,7 +4,7 @@
 
 1. 使用爬虫直接获取需要的数据... 见 `original_data/getdata.py`
 2. 使用github actions每天5点更新数据 见 `.github/workflows/pythonapp.yml`
-3. 使用了github page,所以每天5点以后 会自动更新数据到 https://igaojin.me/bitcoin-bubble-index/这个页面
+3. 使用了github page,所以每天5点以后 会自动更新数据到 https://igaojin.me/bitcoin-bubble-index/  这个页面
 
 ### What's this?
 
