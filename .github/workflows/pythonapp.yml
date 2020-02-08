@@ -29,7 +29,6 @@ jobs:
         python getdata.py
         python process_data.py
     
-    - uses: actions/checkout@v2
     - name: Commit files
       run: |
         git config --local user.email "action@github.com"
