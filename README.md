@@ -1,5 +1,11 @@
 # Bitcoin Bubble Index
 
+## 我做的一些修改
+
+1. 使用爬虫直接获取需要的数据... 见 `original_data/getdata.py`
+2. 使用github actions每天5点更新数据 见 `.github/workflows/pythonapp.yml`
+3. 使用了github page,所以每天5点以后 会自动更新数据到 https://igaojin.me/bitcoin-bubble-index/这个页面
+
 ### What's this?
 
 This project provides a visualization analysis tool for price bubble of Bitcoin, including basic price information, 60-days accumulative increase, hot keywords index, and bubble index. We accumulated the original data (`2010/07/17` - `2019/12/06`) and put them into `/original_data` folder, and we visualize our analysis result using [echarts][1].
